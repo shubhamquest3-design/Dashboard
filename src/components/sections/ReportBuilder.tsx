@@ -1,10 +1,16 @@
 import { useState } from 'react';
+<<<<<<< HEAD
 import { ApprovedWorkforce as ApprovedWorkforceRow, Employee, ExitEmployee } from '../../types/hr';
 import SectionCard from '../ui/SectionCard';
 import {
   Building2, CheckCircle2, CreditCard, Download, FileSpreadsheet, Plus,
   Sparkles, Target, TrendingDown, Trash2, Users
 } from 'lucide-react';
+=======
+import { Employee, ExitEmployee } from '../../types/hr';
+import SectionCard from '../ui/SectionCard';
+import { Download, FileText, Filter, Plus, Trash2 } from 'lucide-react';
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
 interface Report {
   name: string;
@@ -18,6 +24,7 @@ interface Props {
   exits: ExitEmployee[];
 }
 
+<<<<<<< HEAD
 type QuickReportId = 'workforce' | 'attrition' | 'approved' | 'confirmation' | 'hdfc' | 'hiring';
 type Bucket = 'SM' | 'ASM' | 'SSA' | 'SA' | 'OA';
 
@@ -33,6 +40,8 @@ interface WorkbookExport {
   sections: WorkbookSection[];
 }
 
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 const AVAILABLE_METRICS = [
   { id: 'total_employees', name: 'Total Employees', category: 'Headcount' },
   { id: 'active_employees', name: 'Active Employees', category: 'Headcount' },
@@ -46,6 +55,7 @@ const AVAILABLE_METRICS = [
   { id: 'location_count', name: 'Unique Locations', category: 'Distribution' },
 ];
 
+<<<<<<< HEAD
 const QUICK_REPORTS: Array<{
   id: QuickReportId;
   name: string;
@@ -62,6 +72,9 @@ const QUICK_REPORTS: Array<{
 
 const APPROVED_STORAGE_KEY = 'approved_workforce_matrix_v1';
 const BUCKETS: Bucket[] = ['SM', 'ASM', 'SSA', 'SA', 'OA'];
+=======
+const FILTER_OPTIONS = ['Store', 'Location', 'Designation', 'Department', 'Status'];
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
 export default function ReportBuilder({ employees, exits }: Props) {
   const [savedReports, setSavedReports] = useState<Report[]>([]);
@@ -75,23 +88,37 @@ export default function ReportBuilder({ employees, exits }: Props) {
 
   const handleAddMetric = (metricId: string) => {
     if (!newReport.metrics.includes(metricId)) {
+<<<<<<< HEAD
       setNewReport(report => ({ ...report, metrics: [...report.metrics, metricId] }));
+=======
+      setNewReport(r => ({ ...r, metrics: [...r.metrics, metricId] }));
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
     }
   };
 
   const handleRemoveMetric = (metricId: string) => {
+<<<<<<< HEAD
     setNewReport(report => ({ ...report, metrics: report.metrics.filter(metric => metric !== metricId) }));
   };
 
   const handleSaveReport = () => {
     if (newReport.name.trim() && newReport.metrics.length > 0) {
       setSavedReports(prev => [...prev, newReport]);
+=======
+    setNewReport(r => ({ ...r, metrics: r.metrics.filter(m => m !== metricId) }));
+  };
+
+  const handleSaveReport = () => {
+    if (newReport.name && newReport.metrics.length > 0) {
+      setSavedReports([...savedReports, newReport]);
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       setNewReport({ name: 'New Report', metrics: [], filters: {}, dateRange: 'monthly' });
       setShowBuilder(false);
     }
   };
 
   const handleExportReport = (report: Report) => {
+<<<<<<< HEAD
     const workbook = buildCustomReportWorkbook(report, employees, exits);
     downloadWorkbook(workbook);
   };
@@ -99,10 +126,20 @@ export default function ReportBuilder({ employees, exits }: Props) {
   const handleQuickExport = (reportId: QuickReportId) => {
     const workbook = buildQuickReportWorkbook(reportId, employees, exits);
     downloadWorkbook(workbook);
+=======
+    const reportData = generateReportData(report, employees, exits);
+    const csvContent = convertToCSV(reportData, report);
+    downloadCSV(csvContent, `${report.name}.csv`);
+  };
+
+  const handleDeleteReport = (index: number) => {
+    setSavedReports(savedReports.filter((_, i) => i !== index));
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   };
 
   return (
     <div className="space-y-6">
+<<<<<<< HEAD
       <div className="rounded-lg border border-[#e5d8bf] bg-[#fffdf8] px-6 py-5 shadow-[0_10px_24px_rgba(62,44,23,0.08)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -162,17 +199,52 @@ export default function ReportBuilder({ employees, exits }: Props) {
                 value={newReport.name}
                 onChange={event => setNewReport(report => ({ ...report, name: event.target.value }))}
                 className="w-full rounded-lg border-2 border-[#e1d3b6] bg-[#fffdf8] px-4 py-2.5 font-medium text-[#4f3d24] focus:outline-none focus:border-[#c8a43d]"
+=======
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Custom Report Builder</h2>
+          <p className="text-sm text-gray-600 mt-1">Create and export customized HR reports</p>
+        </div>
+        <button
+          onClick={() => setShowBuilder(!showBuilder)}
+          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+        >
+          <Plus size={18} />
+          New Report
+        </button>
+      </div>
+
+      {showBuilder && (
+        <SectionCard title="Build Custom Report">
+          <div className="space-y-6">
+            {/* Report Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Report Name</label>
+              <input
+                type="text"
+                value={newReport.name}
+                onChange={e => setNewReport(r => ({ ...r, name: e.target.value }))}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium"
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                 placeholder="e.g., Monthly HR Report"
               />
             </div>
 
+<<<<<<< HEAD
             <div>
               <label className="mb-3 block text-sm font-semibold text-[#4f3d24]">Select Metrics</label>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+=======
+            {/* Metrics Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Select Metrics</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                 {AVAILABLE_METRICS.map(metric => (
                   <button
                     key={metric.id}
                     onClick={() => handleAddMetric(metric.id)}
+<<<<<<< HEAD
                     className={`rounded-lg border-2 p-3 text-left transition-all ${
                       newReport.metrics.includes(metric.id)
                         ? 'border-[#c8a43d] bg-[#fbf3d5]'
@@ -181,11 +253,22 @@ export default function ReportBuilder({ employees, exits }: Props) {
                   >
                     <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[#9a8052]">{metric.category}</div>
                     <div className="mt-1 text-sm font-bold text-[#1f160d]">{metric.name}</div>
+=======
+                    className={`p-3 rounded-lg border-2 transition-all text-left ${
+                      newReport.metrics.includes(metric.id)
+                        ? 'bg-blue-50 border-blue-500'
+                        : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-gray-600 uppercase">{metric.category}</div>
+                    <div className="text-sm font-semibold text-gray-800 mt-1">{metric.name}</div>
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                   </button>
                 ))}
               </div>
             </div>
 
+<<<<<<< HEAD
             {newReport.metrics.length > 0 && (
               <div>
                 <label className="mb-2 block text-sm font-semibold text-[#4f3d24]">Selected Metrics</label>
@@ -198,6 +281,21 @@ export default function ReportBuilder({ employees, exits }: Props) {
                         <button
                           onClick={() => handleRemoveMetric(metricId)}
                           className="text-[#9b332a] hover:text-[#7d261f]"
+=======
+            {/* Selected Metrics */}
+            {newReport.metrics.length > 0 && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Selected Metrics</label>
+                <div className="flex flex-wrap gap-2">
+                  {newReport.metrics.map(metricId => {
+                    const metric = AVAILABLE_METRICS.find(m => m.id === metricId);
+                    return (
+                      <div key={metricId} className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                        <span className="text-sm font-medium text-blue-900">{metric?.name}</span>
+                        <button
+                          onClick={() => handleRemoveMetric(metricId)}
+                          className="text-blue-600 hover:text-blue-800"
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                         >
                           <Trash2 size={14} />
                         </button>
@@ -208,12 +306,22 @@ export default function ReportBuilder({ employees, exits }: Props) {
               </div>
             )}
 
+<<<<<<< HEAD
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#4f3d24]">Report Period</label>
               <select
                 value={newReport.dateRange}
                 onChange={event => setNewReport(report => ({ ...report, dateRange: event.target.value as Report['dateRange'] }))}
                 className="w-full rounded-lg border-2 border-[#e1d3b6] bg-[#fffdf8] px-4 py-2.5 font-medium text-[#4f3d24] focus:outline-none focus:border-[#c8a43d]"
+=======
+            {/* Date Range */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Report Period</label>
+              <select
+                value={newReport.dateRange}
+                onChange={e => setNewReport(r => ({ ...r, dateRange: e.target.value as any }))}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 font-medium"
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
               >
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
@@ -221,17 +329,30 @@ export default function ReportBuilder({ employees, exits }: Props) {
               </select>
             </div>
 
+<<<<<<< HEAD
             <div className="flex gap-3 border-t border-[#eee4d0] pt-4">
               <button
                 onClick={handleSaveReport}
                 disabled={!newReport.name.trim() || newReport.metrics.length === 0}
                 className="flex-1 rounded-lg bg-[#1f75a8] px-4 py-2.5 font-semibold text-white transition-all hover:bg-[#185e88] disabled:cursor-not-allowed disabled:opacity-50"
+=======
+            {/* Buttons */}
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={handleSaveReport}
+                disabled={!newReport.name || newReport.metrics.length === 0}
+                className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
               >
                 Save Report Template
               </button>
               <button
                 onClick={() => setShowBuilder(false)}
+<<<<<<< HEAD
                 className="flex-1 rounded-lg border border-[#e1d3b6] bg-white px-4 py-2.5 font-semibold text-[#4f3d24] transition-all hover:bg-[#fbf6eb]"
+=======
+                className="flex-1 px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-xl transition-all"
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
               >
                 Cancel
               </button>
@@ -240,6 +361,7 @@ export default function ReportBuilder({ employees, exits }: Props) {
         </SectionCard>
       )}
 
+<<<<<<< HEAD
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-[#1f160d]">Saved Reports ({savedReports.length})</h3>
         {savedReports.length === 0 ? (
@@ -259,12 +381,35 @@ export default function ReportBuilder({ employees, exits }: Props) {
                         const metric = AVAILABLE_METRICS.find(item => item.id === metricId);
                         return (
                           <span key={metricId} className="rounded-lg bg-[#fbf3d5] px-2.5 py-1 text-xs font-semibold text-[#6d5520]">
+=======
+      {/* Saved Reports */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold text-gray-900">Saved Reports ({savedReports.length})</h3>
+        {savedReports.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
+            <FileText size={40} className="mx-auto text-gray-400 mb-3" />
+            <p className="text-gray-600 font-medium">No reports yet. Create your first custom report!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {savedReports.map((report, idx) => (
+              <SectionCard key={idx} title={report.name} subtitle={`${report.metrics.length} metrics`}>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs font-bold text-gray-600 uppercase mb-2">Metrics</div>
+                    <div className="flex flex-wrap gap-2">
+                      {report.metrics.map(metricId => {
+                        const metric = AVAILABLE_METRICS.find(m => m.id === metricId);
+                        return (
+                          <span key={metricId} className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                             {metric?.name}
                           </span>
                         );
                       })}
                     </div>
                   </div>
+<<<<<<< HEAD
                   <div className="flex gap-2 border-t border-[#eee4d0] pt-3">
                     <button
                       onClick={() => handleExportReport(report)}
@@ -276,6 +421,19 @@ export default function ReportBuilder({ employees, exits }: Props) {
                     <button
                       onClick={() => setSavedReports(prev => prev.filter((_, savedIndex) => savedIndex !== index))}
                       className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#fef2f2] px-3 py-2 font-semibold text-[#b9342b] transition-all hover:bg-[#fde8e8]"
+=======
+                  <div className="pt-3 border-t border-gray-200 flex gap-2">
+                    <button
+                      onClick={() => handleExportReport(report)}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-all"
+                    >
+                      <Download size={16} />
+                      Export
+                    </button>
+                    <button
+                      onClick={() => handleDeleteReport(idx)}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-100 hover:bg-red-200 text-red-600 font-semibold rounded-lg transition-all"
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                     >
                       <Trash2 size={16} />
                       Delete
@@ -291,8 +449,18 @@ export default function ReportBuilder({ employees, exits }: Props) {
   );
 }
 
+<<<<<<< HEAD
 function buildCustomReportWorkbook(report: Report, employees: Employee[], exits: ExitEmployee[]): WorkbookExport {
   const summary: Array<[string, string | number]> = [];
+=======
+function generateReportData(report: Report, employees: Employee[], exits: ExitEmployee[]) {
+  const data: Record<string, any> = {
+    reportName: report.name,
+    generatedDate: new Date().toISOString(),
+    metrics: {},
+  };
+
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const totalEmployees = employees.length;
   const totalAttrition = exits.length;
   const totalEverEmployed = totalEmployees + totalAttrition;
@@ -300,6 +468,7 @@ function buildCustomReportWorkbook(report: Report, employees: Employee[], exits:
   report.metrics.forEach(metricId => {
     switch (metricId) {
       case 'total_employees':
+<<<<<<< HEAD
         summary.push(['Total Employees', totalEmployees]);
         break;
       case 'active_employees':
@@ -330,10 +499,49 @@ function buildCustomReportWorkbook(report: Report, employees: Employee[], exits:
         summary.push(['Unique Locations', new Set(employees.map(employee => employee.location)).size]);
         break;
       default:
+=======
+        data.metrics['Total Employees'] = totalEmployees;
+        break;
+      case 'active_employees':
+        data.metrics['Active Employees'] = employees.filter(e => e.status === 'Active').length;
+        break;
+      case 'retention_rate':
+        data.metrics['Retention Rate (%)'] = totalEverEmployed > 0 ? ((totalEmployees / totalEverEmployed) * 100).toFixed(2) : 0;
+        break;
+      case 'attrition_rate':
+        data.metrics['Attrition Rate (%)'] = totalEverEmployed > 0 ? ((totalAttrition / totalEverEmployed) * 100).toFixed(2) : 0;
+        break;
+      case 'new_hires_mtd':
+        const today = new Date();
+        data.metrics['New Hires (MTD)'] = employees.filter(e => {
+          const d = new Date(e.doj);
+          return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+        }).length;
+        break;
+      case 'confirmation_rate':
+        data.metrics['Confirmation Rate (%)'] = totalEmployees > 0 ? ((employees.filter(e => e.confirmationStatus === 'Confirmed').length / totalEmployees) * 100).toFixed(2) : 0;
+        break;
+      case 'hdfc_pending':
+        data.metrics['HDFC Pending'] = employees.filter(e => e.hdfcAccount === 'No').length;
+        break;
+      case 'avg_tenure':
+        const avgMonths = totalEmployees > 0 ? employees.reduce((sum, e) => sum + parseFloat(e.tenure.match(/\d+/)?.[0] || '0'), 0) / totalEmployees : 0;
+        data.metrics['Average Tenure'] = avgMonths.toFixed(1);
+        break;
+      case 'gender_diversity':
+        const males = employees.filter(e => e.gender === 'Male').length;
+        const females = employees.filter(e => e.gender === 'Female').length;
+        const score = totalEmployees > 0 ? Math.min((Math.abs(males - females) / totalEmployees) * 100, 100) : 0;
+        data.metrics['Gender Diversity Score'] = score.toFixed(1);
+        break;
+      case 'location_count':
+        data.metrics['Unique Locations'] = new Set(employees.map(e => e.location)).size;
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
         break;
     }
   });
 
+<<<<<<< HEAD
   return {
     title: report.name,
     filename: `${slugify(report.name)}.xls`,
@@ -1061,4 +1269,29 @@ function QuickIcon({ id }: { id: QuickReportId }) {
     default:
       return <div className={`${base} bg-slate-50 text-slate-700`}><Sparkles size={18} /></div>;
   }
+=======
+  return data;
+}
+
+function convertToCSV(reportData: Record<string, any>, report: Report): string {
+  const lines: string[] = [];
+  lines.push(`Report: ${reportData.reportName}`);
+  lines.push(`Generated: ${new Date(reportData.generatedDate).toLocaleString()}`);
+  lines.push('');
+  lines.push('Metric,Value');
+  Object.entries(reportData.metrics).forEach(([key, value]) => {
+    lines.push(`"${key}","${value}"`);
+  });
+  return lines.join('\n');
+}
+
+function downloadCSV(content: string, filename: string) {
+  const element = document.createElement('a');
+  element.setAttribute('href', `data:text/csv;charset=utf-8,${encodeURIComponent(content)}`);
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 }

@@ -33,9 +33,12 @@ export function parseEmployeesFromSheet(rows: string[][]): Employee[] {
     if (rawStatus === 'confirmed') confirmationStatus = 'Confirmed';
     else if (dueDate && dueDate < today) confirmationStatus = 'Overdue';
 
+<<<<<<< HEAD
     const hdfcRaw = get('hdfc_account') || get('hdfc_account_status') || '';
     const hdfcAccount = normalizeHdfcStatus(hdfcRaw);
 
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
     return {
       id: get('employee_id') || `EMP${String(idx + 1).padStart(4, '0')}`,
       name: get('employee_name') || get('name') || '',
@@ -50,7 +53,11 @@ export function parseEmployeesFromSheet(rows: string[][]): Employee[] {
       reportingManager: get('reporting_manager') || '',
       hiringSource: (get('hiring_source') as Employee['hiringSource']) || 'Walk-in',
       age: parseInt(get('age')) || undefined,
+<<<<<<< HEAD
       hdfcAccount,
+=======
+      hdfcAccount: (get('hdfc_account') || get('hdfc_account_status') || 'No') as Employee['hdfcAccount'],
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       hrbpName: get('hrbp_name') || get('hrbp') || '',
       confirmationStatus,
       confirmationDueDate: confirmationDue,
@@ -89,6 +96,7 @@ function addDays(dateStr: string, days: number): string {
   return d.toISOString().split('T')[0];
 }
 
+<<<<<<< HEAD
 function normalizeHdfcStatus(value: string): Employee['hdfcAccount'] {
   const normalized = value.trim().toLowerCase();
   if (['yes', 'done', 'completed', 'complete', 'created', 'created yes'].includes(normalized)) {
@@ -100,6 +108,8 @@ function normalizeHdfcStatus(value: string): Employee['hdfcAccount'] {
   return normalized === 'yes' ? 'Yes' : 'No';
 }
 
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 export function getTenureBucket(doj: string): string {
   const months = (Date.now() - new Date(doj).getTime()) / (1000 * 60 * 60 * 24 * 30);
   if (months < 3) return '0-3 Months';

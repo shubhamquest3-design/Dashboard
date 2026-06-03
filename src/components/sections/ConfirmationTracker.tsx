@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import { useMemo, useState } from 'react';
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 import { Employee } from '../../types/hr';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
@@ -13,7 +16,10 @@ interface Props { employees: Employee[] }
 
 export default function ConfirmationTracker({ employees }: Props) {
   const today = new Date();
+<<<<<<< HEAD
   const [activeGroup, setActiveGroup] = useState<'confirmed' | 'pending' | 'overdue' | 'dueWeek' | null>(null);
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const confirmed = employees.filter(e => e.confirmationStatus === 'Confirmed');
   const pending = employees.filter(e => e.confirmationStatus === 'Pending');
@@ -41,6 +47,7 @@ export default function ConfirmationTracker({ employees }: Props) {
 
   // Store-wise pending
   const storePending = buildStorePending(overdue.concat(pending));
+<<<<<<< HEAD
   const activeRows = useMemo(() => {
     switch (activeGroup) {
       case 'confirmed': return confirmed;
@@ -57,6 +64,8 @@ export default function ConfirmationTracker({ employees }: Props) {
     dueWeek: 'Confirmations Due This Week',
     null: '',
   }[activeGroup ?? 'null'];
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const columns = [
     { key: 'id', label: 'EMP ID' },
@@ -101,6 +110,7 @@ export default function ConfirmationTracker({ employees }: Props) {
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+<<<<<<< HEAD
         <button onClick={() => setActiveGroup('confirmed')} className="text-left">
           <KPICard title="Confirmed" value={confirmed.length}
           subtitle={`${((confirmed.length / Math.max(employees.length, 1)) * 100).toFixed(0)}% of eligible`}
@@ -118,6 +128,17 @@ export default function ConfirmationTracker({ employees }: Props) {
           <KPICard title="Due This Week" value={dueThisWeek.length} subtitle="Need immediate action"
           icon={<CheckSquare size={20} />} colorClass="text-blue-600" bgClass="bg-blue-50" borderClass="border-blue-100" />
         </button>
+=======
+        <KPICard title="Confirmed" value={confirmed.length}
+          subtitle={`${((confirmed.length / Math.max(employees.length, 1)) * 100).toFixed(0)}% of eligible`}
+          icon={<CheckCircle size={20} />} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
+        <KPICard title="Pending" value={pending.length} subtitle="Awaiting confirmation"
+          icon={<Clock size={20} />} colorClass="text-amber-600" bgClass="bg-amber-50" borderClass="border-amber-100" />
+        <KPICard title="Overdue" value={overdue.length} subtitle="Past 60-day mark"
+          icon={<AlertTriangle size={20} />} colorClass="text-red-600" bgClass="bg-red-50" borderClass="border-red-100" />
+        <KPICard title="Due This Week" value={dueThisWeek.length} subtitle="Need immediate action"
+          icon={<CheckSquare size={20} />} colorClass="text-blue-600" bgClass="bg-blue-50" borderClass="border-blue-100" />
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       </div>
 
       {/* Alert: Overdue */}
@@ -224,6 +245,7 @@ export default function ConfirmationTracker({ employees }: Props) {
           />
         </SectionCard>
       )}
+<<<<<<< HEAD
 
       {activeGroup && (
         <DetailOverlay
@@ -233,6 +255,8 @@ export default function ConfirmationTracker({ employees }: Props) {
           onClose={() => setActiveGroup(null)}
         />
       )}
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
     </div>
   );
 }
@@ -265,6 +289,7 @@ function buildStorePending(employees: Employee[]) {
   });
   return Object.values(map).sort((a, b) => (b.pending + b.overdue) - (a.pending + a.overdue));
 }
+<<<<<<< HEAD
 
 function DetailOverlay({ title, rows, today, onClose }: {
   title: string;
@@ -313,3 +338,5 @@ function DetailOverlay({ title, rows, today, onClose }: {
     </div>
   );
 }
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc

@@ -69,6 +69,7 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
     loadData();
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(loadData, refreshInterval);
+<<<<<<< HEAD
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         loadData();
@@ -81,6 +82,9 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
       window.removeEventListener('focus', loadData);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
+=======
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   }, [loadData, refreshInterval]);
 
   const filteredEmployees = state.employees.filter(emp => {
@@ -100,8 +104,11 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
     if (filters.store && exit.store !== filters.store) return false;
     if (filters.location && exit.location !== filters.location) return false;
     if (filters.designation && exit.designation !== filters.designation) return false;
+<<<<<<< HEAD
     if (filters.dateFrom && exit.dol < filters.dateFrom) return false;
     if (filters.dateTo && exit.doj > filters.dateTo) return false;
+=======
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
     return true;
   });
 

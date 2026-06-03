@@ -1,9 +1,15 @@
 import { Employee, ExitEmployee } from '../../types/hr';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
+<<<<<<< HEAD
 import { TrendingUp, Calendar, AlertCircle, Target } from 'lucide-react';
 import {
   Line, AreaChart, Area, BarChart, ScatterChart, Scatter,
+=======
+import { TrendingUp, Calendar, AlertCircle, Target, Zap } from 'lucide-react';
+import {
+  LineChart, Line, AreaChart, Area, ScatterChart, Scatter,
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ComposedChart, Bar, Legend
 } from 'recharts';
@@ -15,6 +21,10 @@ interface Props {
 
 export default function AdvancedAnalytics({ employees, exits }: Props) {
   const today = new Date();
+<<<<<<< HEAD
+=======
+  const sixMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 6, 1);
+>>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   // Attrition trend (last 6 months)
   const attritionTrend = buildAttritionTrend(employees, exits);
