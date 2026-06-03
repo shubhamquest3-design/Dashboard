@@ -1,21 +1,13 @@
-<<<<<<< HEAD
 import { useEffect, useMemo, useState } from 'react';
 import { Employee, ExitEmployee } from '../../types/hr';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
 import DataTable from '../ui/DataTable';
 import { Clock, Download, Target, TrendingUp, Upload, Users, Zap } from 'lucide-react';
-=======
-import { Employee } from '../../types/hr';
-import KPICard from '../ui/KPICard';
-import SectionCard from '../ui/SectionCard';
-import DataTable from '../ui/DataTable';
-import { Target, TrendingUp, Users, Zap } from 'lucide-react';
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 import {
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend, LineChart, Line, AreaChart, Area
+  Legend, AreaChart, Area
 } from 'recharts';
 
 const SOURCE_COLORS: Record<string, string> = {
@@ -26,7 +18,6 @@ const SOURCE_COLORS: Record<string, string> = {
   'Consultant': '#8b5cf6',
 };
 
-<<<<<<< HEAD
 const OPEN_POSITIONS_STORAGE_KEY = 'hiring_open_positions_v1';
 
 interface OpenPositionRow {
@@ -48,21 +39,13 @@ export default function HiringAnalytics({ employees, exits }: Props) {
   const [hireSource, setHireSource] = useState('');
   const [hireDesignation, setHireDesignation] = useState('');
   const [hireDepartment, setHireDepartment] = useState('');
-=======
-interface Props { employees: Employee[] }
-
-export default function HiringAnalytics({ employees }: Props) {
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const sourceBreakdown = buildSourceBreakdown(employees);
   const totalHires = employees.length;
   const topSource = sourceBreakdown[0]?.source ?? 'N/A';
   const monthlyTrend = buildMonthlyBySource(employees);
   const storeSource = buildStoreSource(employees);
-<<<<<<< HEAD
   const hiringCycle = buildHiringCycle(employees, exits);
   const avgOpenDays = hiringCycle.length > 0 ? Math.round(hiringCycle.reduce((sum, row) => sum + row.daysOpen, 0) / hiringCycle.length) : 0;
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const thisMonthHires = employees.filter(e => {
     const d = new Date(e.doj);
@@ -74,7 +57,6 @@ export default function HiringAnalytics({ employees }: Props) {
   const referralPct = ((referralCount / Math.max(totalHires, 1)) * 100).toFixed(0);
 
   const pieData = sourceBreakdown.map(s => ({ name: s.source, value: s.count }));
-<<<<<<< HEAD
   const uploadedPositions = openPositions.map(row => ({
     ...row,
     daysOpen: row.status === 'Closed'
@@ -101,8 +83,6 @@ export default function HiringAnalytics({ employees }: Props) {
   useEffect(() => {
     window.localStorage.setItem(OPEN_POSITIONS_STORAGE_KEY, JSON.stringify(openPositions));
   }, [openPositions]);
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const columns = [
     { key: 'id', label: 'EMP ID' },
@@ -132,7 +112,6 @@ export default function HiringAnalytics({ employees }: Props) {
           icon={<Target size={20} />} colorClass="text-amber-600" bgClass="bg-amber-50" borderClass="border-amber-100" />
         <KPICard title="Employee Referral" value={`${referralPct}%`} subtitle={`${referralCount} referrals`}
           icon={<Zap size={20} />} colorClass="text-cyan-600" bgClass="bg-cyan-50" borderClass="border-cyan-100" />
-<<<<<<< HEAD
         <KPICard title="Avg Open Days" value={avgOpenDays} subtitle="Open to close / current"
           icon={<Clock size={20} />} colorClass="text-violet-600" bgClass="bg-violet-50" borderClass="border-violet-100" />
       </div>
@@ -182,10 +161,6 @@ export default function HiringAnalytics({ employees }: Props) {
         </div>
       </SectionCard>
 
-=======
-      </div>
-
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       {/* Source stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {sourceBreakdown.map(s => (
@@ -207,7 +182,7 @@ export default function HiringAnalytics({ employees }: Props) {
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie data={pieData} cx="50%" cy="50%" outerRadius={90} paddingAngle={3} dataKey="value"
-                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine>
+                label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`} labelLine>
                 {pieData.map((entry) => (
                   <Cell key={entry.name} fill={SOURCE_COLORS[entry.name] || '#94a3b8'} />
                 ))}
@@ -263,7 +238,6 @@ export default function HiringAnalytics({ employees }: Props) {
       {/* Hiring Table */}
       <SectionCard title="Hiring Register" subtitle={`${employees.length} employees`}
         action={<span className="text-xs text-gray-400 font-medium">Searchable</span>}>
-<<<<<<< HEAD
         <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-4">
           <SelectFilter label="Store" value={hireStore} options={hireStores} onChange={setHireStore} />
           <SelectFilter label="Source" value={hireSource} options={hireSources} onChange={setHireSource} />
@@ -273,16 +247,10 @@ export default function HiringAnalytics({ employees }: Props) {
         <DataTable
           columns={columns as Parameters<typeof DataTable>[0]['columns']}
           data={filteredEmployees as unknown as Record<string, unknown>[]}
-=======
-        <DataTable
-          columns={columns as Parameters<typeof DataTable>[0]['columns']}
-          data={employees as unknown as Record<string, unknown>[]}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
           pageSize={12}
           searchFields={['name', 'id', 'hiringSource', 'store', 'location', 'designation'] as never[]}
         />
       </SectionCard>
-<<<<<<< HEAD
 
       <SectionCard title="Position Open / Close Days" subtitle="Open date to close date, or current date for active positions">
         <DataTable
@@ -327,8 +295,6 @@ export default function HiringAnalytics({ employees }: Props) {
           />
         </SectionCard>
       )}
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
     </div>
   );
 }
@@ -380,7 +346,6 @@ function buildStoreSource(employees: Employee[]) {
     return bt - at;
   });
 }
-<<<<<<< HEAD
 
 function buildHiringCycle(employees: Employee[], exits: ExitEmployee[]) {
   const exitMap = new Map(exits.map(exit => [exit.id, exit]));
@@ -522,5 +487,3 @@ function SelectFilter({
     </select>
   );
 }
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc

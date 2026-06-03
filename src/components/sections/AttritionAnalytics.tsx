@@ -1,16 +1,9 @@
 import { Employee, ExitEmployee } from '../../types/hr';
-<<<<<<< HEAD
 import { useMemo, useState } from 'react';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
 import DataTable from '../ui/DataTable';
 import { TrendingDown, Clock, BarChart2, AlertCircle, Users } from 'lucide-react';
-=======
-import KPICard from '../ui/KPICard';
-import SectionCard from '../ui/SectionCard';
-import DataTable from '../ui/DataTable';
-import { TrendingDown, Clock, BarChart2, AlertCircle } from 'lucide-react';
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, FunnelChart, Funnel, LabelList
@@ -21,15 +14,12 @@ const COLORS = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981', '#06b6d4'
 interface Props { employees: Employee[]; exits: ExitEmployee[] }
 
 export default function AttritionAnalytics({ employees, exits }: Props) {
-<<<<<<< HEAD
   const [exitStore, setExitStore] = useState('');
   const [exitType, setExitType] = useState('');
   const [exitReasonFilter, setExitReasonFilter] = useState('');
   const [exitDesignation, setExitDesignation] = useState('');
   const [tenureBand, setTenureBand] = useState('');
 
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const totalLeft = exits.length;
   const attrPct = ((totalLeft / Math.max(employees.length + totalLeft, 1)) * 100).toFixed(1);
   const voluntary = exits.filter(e => e.exitType === 'Voluntary').length;
@@ -42,17 +32,13 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
   const storeAttrition = groupCount(exits, 'store').slice(0, 8);
   const locationAttrition = groupCount(exits, 'location').slice(0, 8);
   const exitReasons = groupCount(exits, 'exitReason');
-<<<<<<< HEAD
   const topReason = exitReasons[0]?.name ?? 'N/A';
   const topReasonCount = exitReasons[0]?.count ?? 0;
   const exitGender = buildGenderExitSplit(employees, exits);
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const voluntaryData = [
     { name: 'Voluntary', value: voluntary },
     { name: 'Non-Voluntary', value: nonVoluntary },
   ];
-<<<<<<< HEAD
   const reasonCenterData = exitReasons.slice(0, 6);
   const exitStores = useMemo(() => [...new Set(exits.map(e => e.store))].sort(), [exits]);
   const filteredExits = useMemo(() => exits.filter(exit => {
@@ -65,8 +51,6 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
     if (tenureBand === '12+' && exit.tenureAtExit <= 12) return false;
     return true;
   }), [exits, exitStore, exitType, exitReasonFilter, tenureBand]);
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const funnelData = [
     { name: 'Total Workforce', value: employees.length + exits.length, fill: '#3b82f6' },
@@ -95,18 +79,13 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
   return (
     <div className="space-y-6">
       {/* KPIs */}
-<<<<<<< HEAD
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-=======
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
         <KPICard title="Total Exits" value={totalLeft} subtitle="All time"
           icon={<TrendingDown size={20} />} colorClass="text-red-600" bgClass="bg-red-50" borderClass="border-red-100" />
         <KPICard title="Attrition Rate" value={`${attrPct}%`} subtitle="Overall"
           icon={<BarChart2 size={20} />} colorClass="text-orange-600" bgClass="bg-orange-50" borderClass="border-orange-100" />
         <KPICard title="Avg Tenure at Exit" value={`${avgTenure} mo`} subtitle="Before leaving"
           icon={<Clock size={20} />} colorClass="text-amber-600" bgClass="bg-amber-50" borderClass="border-amber-100" />
-<<<<<<< HEAD
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -204,13 +183,6 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
         </div>
       </SectionCard>
 
-=======
-        <KPICard title="Voluntary Exits" value={`${((voluntary / Math.max(totalLeft, 1)) * 100).toFixed(0)}%`}
-          subtitle={`${voluntary} of ${totalLeft}`}
-          icon={<AlertCircle size={20} />} colorClass="text-blue-600" bgClass="bg-blue-50" borderClass="border-blue-100" />
-      </div>
-
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SectionCard title="Monthly Attrition Trend" subtitle="Exits per month (last 12 months)" className="lg:col-span-2">
@@ -229,11 +201,7 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={voluntaryData} cx="50%" cy="50%" innerRadius={50} outerRadius={85} paddingAngle={4} dataKey="value"
-<<<<<<< HEAD
                 label={({ name, percent }) => `${name} ${(Math.round(((percent ?? 0) * 100)))}%`} labelLine={false}>
-=======
-                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
                 <Cell fill="#f97316" />
                 <Cell fill="#ef4444" />
               </Pie>
@@ -262,7 +230,6 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
 
         <SectionCard title="Exit Reason Analysis" subtitle="Why employees leave">
           <ResponsiveContainer width="100%" height={240}>
-<<<<<<< HEAD
             <BarChart data={reasonCenterData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-25} textAnchor="end" height={55} />
@@ -270,15 +237,6 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
               <Tooltip contentStyle={{ fontSize: 12 }} />
               <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Count">
                 {reasonCenterData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-=======
-            <BarChart data={exitReasons.slice(0, 8)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-30} textAnchor="end" height={55} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ fontSize: 12 }} />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Count">
-                {exitReasons.slice(0, 8).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -314,7 +272,6 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
       </SectionCard>
 
       {/* Exit Table */}
-<<<<<<< HEAD
       <SectionCard title="Exit Register" subtitle={`${filteredExits.length} employee exits`}>
         <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-4">
           <SelectFilter label="Store" value={exitStore} options={exitStores} onChange={setExitStore} />
@@ -326,12 +283,6 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
         <DataTable
           columns={columns as Parameters<typeof DataTable>[0]['columns']}
           data={filteredExits as unknown as Record<string, unknown>[]}
-=======
-      <SectionCard title="Exit Register" subtitle={`${exits.length} employee exits`}>
-        <DataTable
-          columns={columns as Parameters<typeof DataTable>[0]['columns']}
-          data={exits as unknown as Record<string, unknown>[]}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
           pageSize={10}
           searchFields={['name', 'id', 'store', 'exitReason'] as never[]}
         />
@@ -357,7 +308,6 @@ function buildMonthlyAttrition(exits: ExitEmployee[]) {
   exits.forEach(e => { const k = e.dol.substring(0, 7); if (months[k]) months[k].exits++; });
   return Object.values(months);
 }
-<<<<<<< HEAD
 
 function MiniSplit({ label, count, total, color }: { label: string; count: number; total: number; color: string }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
@@ -417,5 +367,3 @@ function SelectFilter({
     </select>
   );
 }
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc

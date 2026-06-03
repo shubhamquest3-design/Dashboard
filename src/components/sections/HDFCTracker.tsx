@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 import { useMemo, useState } from 'react';
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 import { Employee } from '../../types/hr';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
@@ -15,10 +12,7 @@ import {
 interface Props { employees: Employee[] }
 
 export default function HDFCTracker({ employees }: Props) {
-<<<<<<< HEAD
   const [activeGroup, setActiveGroup] = useState<'completed' | 'pending' | 'stores' | 'locations' | null>(null);
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const completed = employees.filter(e => e.hdfcAccount === 'Yes');
   const pending = employees.filter(e => e.hdfcAccount === 'No');
   const completionPct = employees.length > 0 ? ((completed.length / employees.length) * 100).toFixed(1) : '0';
@@ -30,14 +24,11 @@ export default function HDFCTracker({ employees }: Props) {
 
   const storeData = buildStoreData(employees);
   const locationData = buildLocationData(employees);
-<<<<<<< HEAD
   const activeRows = useMemo(() => {
     if (activeGroup === 'completed') return completed;
     if (activeGroup === 'pending') return pending;
     return [];
   }, [activeGroup, completed, pending]);
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const columns = [
     { key: 'id', label: 'EMP ID' },
@@ -65,7 +56,6 @@ export default function HDFCTracker({ employees }: Props) {
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-<<<<<<< HEAD
         <button onClick={() => setActiveGroup('completed')} className="text-left">
           <KPICard title="Accounts Completed" value={completed.length} subtitle={`${completionPct}% done`}
           icon={<CheckCircle size={20} />} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
@@ -74,12 +64,6 @@ export default function HDFCTracker({ employees }: Props) {
           <KPICard title="Accounts Pending" value={pending.length} subtitle="Not yet onboarded"
           icon={<XCircle size={20} />} colorClass="text-red-600" bgClass="bg-red-50" borderClass="border-red-100" />
         </button>
-=======
-        <KPICard title="Accounts Completed" value={completed.length} subtitle={`${completionPct}% done`}
-          icon={<CheckCircle size={20} />} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
-        <KPICard title="Accounts Pending" value={pending.length} subtitle="Not yet onboarded"
-          icon={<XCircle size={20} />} colorClass="text-red-600" bgClass="bg-red-50" borderClass="border-red-100" />
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
         <KPICard title="Completion Rate" value={`${completionPct}%`} subtitle="Overall"
           icon={<CreditCard size={20} />} colorClass="text-blue-600" bgClass="bg-blue-50" borderClass="border-blue-100" />
         <KPICard title="Stores Affected" value={storeData.filter(s => s.pending > 0).length}
@@ -111,7 +95,7 @@ export default function HDFCTracker({ employees }: Props) {
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={85} paddingAngle={4} dataKey="value"
-                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
                 <Cell fill="#10b981" />
                 <Cell fill="#ef4444" />
               </Pie>
@@ -171,7 +155,6 @@ export default function HDFCTracker({ employees }: Props) {
           searchFields={['name', 'id', 'store', 'location', 'hrbpName'] as never[]}
         />
       </SectionCard>
-<<<<<<< HEAD
 
       {activeGroup && (
         <div className="fixed inset-0 z-50 bg-black/40 p-4 flex items-center justify-center">
@@ -198,8 +181,6 @@ export default function HDFCTracker({ employees }: Props) {
           </div>
         </div>
       )}
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
     </div>
   );
 }

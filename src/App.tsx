@@ -6,10 +6,7 @@ import { STORES, LOCATIONS, DESIGNATIONS } from './data/mockData';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import ExecutiveSummary from './components/sections/ExecutiveSummary';
-<<<<<<< HEAD
 import ApprovedWorkforce from './components/sections/ApprovedWorkforce';
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 import WorkforceAnalytics from './components/sections/WorkforceAnalytics';
 import AttritionAnalytics from './components/sections/AttritionAnalytics';
 import AdvancedAnalytics from './components/sections/AdvancedAnalytics';
@@ -59,11 +56,7 @@ export default function App() {
   );
 
   return (
-<<<<<<< HEAD
     <div className="flex h-screen bg-[#f4efe6] overflow-hidden">
-=======
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <Sidebar
         active={section}
         onNav={setSection}
@@ -98,20 +91,14 @@ export default function App() {
         {loading && (
           <div className="flex-1 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
-<<<<<<< HEAD
               <div className="w-10 h-10 border-4 border-[#eadfc8] border-t-[#c8a43d] rounded-full animate-spin" />
               <p className="text-sm font-medium text-[#8a7553]">Loading HR data...</p>
-=======
-              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-              <p className="text-sm text-gray-500">Loading HR data...</p>
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
             </div>
           </div>
         )}
 
         {/* Content */}
         {!loading && (
-<<<<<<< HEAD
           <main className="flex-1 overflow-y-auto p-6 bg-[#f4efe6]">
             {section === 'executive' && (
               <ExecutiveSummary employees={filteredEmployees} exits={filteredExits} />
@@ -121,14 +108,6 @@ export default function App() {
             )}
             {section === 'workforce' && (
               <WorkforceAnalytics employees={filteredEmployees} exits={filteredExits} />
-=======
-          <main className="flex-1 overflow-y-auto p-6">
-            {section === 'executive' && (
-              <ExecutiveSummary employees={filteredEmployees} exits={filteredExits} />
-            )}
-            {section === 'workforce' && (
-              <WorkforceAnalytics employees={filteredEmployees} />
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
             )}
             {section === 'attrition' && (
               <AttritionAnalytics employees={filteredEmployees} exits={filteredExits} />
@@ -146,11 +125,7 @@ export default function App() {
               <HDFCTracker employees={filteredEmployees} />
             )}
             {section === 'hiring' && (
-<<<<<<< HEAD
               <HiringAnalytics employees={filteredEmployees} exits={filteredExits} />
-=======
-              <HiringAnalytics employees={filteredEmployees} />
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
             )}
             {section === 'settings' && (
               <SettingsPanel

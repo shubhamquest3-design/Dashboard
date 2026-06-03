@@ -15,11 +15,8 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
     apiKey: config?.apiKey ?? '',
     employeeSheetName: config?.employeeSheetName ?? 'Employees',
     exitSheetName: config?.exitSheetName ?? 'Exit',
-<<<<<<< HEAD
     approvedWorkforceSheetName: config?.approvedWorkforceSheetName ?? 'Approved Workforce',
     openPositionsSheetName: config?.openPositionsSheetName ?? 'Open Positions',
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   });
   const [saved, setSaved] = useState(false);
 
@@ -91,7 +88,6 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               />
             </FormField>
-<<<<<<< HEAD
             <FormField label="Approved Workforce Sheet Name" hint="Tab name for store-wise workforce plan">
               <input
                 type="text"
@@ -110,8 +106,6 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               />
             </FormField>
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
           </div>
 
           <button
@@ -140,7 +134,6 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
             title="Sheet 2: Exit"
             columns={['Employee ID', 'Employee Name', 'DOJ', 'DOL', 'Exit Reason', 'Voluntary / Non-Voluntary', 'Store', 'Location', 'Designation', 'Tenure at Exit']}
           />
-<<<<<<< HEAD
           <SheetStructure
             title="Sheet 3: Approved Workforce"
             columns={['Store', 'Location', 'Approved SM', 'Approved ASM', 'Approved SSA', 'Approved SA', 'Approved OA']}
@@ -149,8 +142,6 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
             title="Sheet 4: Open Positions"
             columns={['ID', 'Store', 'Position', 'Open Date', 'Close Date', 'Status', 'Owner']}
           />
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
         </div>
       </div>
 
@@ -193,11 +184,7 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
           Quick Setup Guide
         </h3>
         <ol className="space-y-2 text-sm text-blue-800">
-<<<<<<< HEAD
           <li className="flex gap-2"><span className="font-bold w-5 shrink-0">1.</span> Create a Google Sheet with 4 tabs: "Employees", "Exit", "Approved Workforce", and "Open Positions"</li>
-=======
-          <li className="flex gap-2"><span className="font-bold w-5 shrink-0">1.</span> Create a Google Sheet with 2 tabs: "Employees" and "Exit"</li>
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
           <li className="flex gap-2"><span className="font-bold w-5 shrink-0">2.</span> Add column headers exactly as shown above (Row 1)</li>
           <li className="flex gap-2"><span className="font-bold w-5 shrink-0">3.</span> Go to Google Cloud Console → Enable Google Sheets API → Create API Key</li>
           <li className="flex gap-2"><span className="font-bold w-5 shrink-0">4.</span> Set the sheet to "Anyone with link can view"</li>

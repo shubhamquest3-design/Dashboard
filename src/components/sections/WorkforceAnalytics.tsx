@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import { Employee, ExitEmployee } from '../../types/hr';
 import { STORES } from '../../data/mockData';
-=======
-import { Employee } from '../../types/hr';
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
 import DataTable from '../ui/DataTable';
@@ -16,15 +12,9 @@ import {
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#ec4899'];
 
-<<<<<<< HEAD
 interface Props { employees: Employee[]; exits: ExitEmployee[] }
 
 export default function WorkforceAnalytics({ employees, exits }: Props) {
-=======
-interface Props { employees: Employee[] }
-
-export default function WorkforceAnalytics({ employees }: Props) {
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const today = new Date();
 
   const active = employees.filter(e => e.status === 'Active').length;
@@ -37,15 +27,7 @@ export default function WorkforceAnalytics({ employees }: Props) {
   const tenureData = tenureBuckets.map(b => ({
     name: b, count: employees.filter(e => e.tenure === b).length,
   }));
-<<<<<<< HEAD
   const monthlyJoining = buildMonthlyJoining(employees);
-=======
-
-  // Monthly joining
-  const monthlyJoining = buildMonthlyJoining(employees);
-
-  // Age distribution
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const ageGroups = [
     { name: '18-24', count: employees.filter(e => (e.age ?? 0) >= 18 && (e.age ?? 0) <= 24).length },
     { name: '25-30', count: employees.filter(e => (e.age ?? 0) >= 25 && (e.age ?? 0) <= 30).length },
@@ -53,17 +35,11 @@ export default function WorkforceAnalytics({ employees }: Props) {
     { name: '36-40', count: employees.filter(e => (e.age ?? 0) >= 36 && (e.age ?? 0) <= 40).length },
     { name: '40+', count: employees.filter(e => (e.age ?? 0) > 40).length },
   ];
-<<<<<<< HEAD
-=======
-
-  // Status distribution
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   const statusData = [
     { name: 'Active', value: active },
     { name: 'On Leave', value: onLeave },
     { name: 'Inactive', value: employees.filter(e => e.status === 'Inactive').length },
   ];
-<<<<<<< HEAD
   const radarData = departments.slice(0, 7).map(d => ({
     dept: d.name.length > 12 ? `${d.name.substring(0, 12)}...` : d.name,
     count: d.count,
@@ -72,14 +48,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
   const existingStores = storeStatus.filter(row => row.status === 'Existing');
   const exitingStores = storeStatus.filter(row => row.status === 'Exiting');
   const upcomingStores = storeStatus.filter(row => row.status === 'Upcoming');
-=======
-
-  // Designation radar
-  const radarData = departments.slice(0, 7).map(d => ({
-    dept: d.name.length > 12 ? d.name.substring(0, 12) + '…' : d.name,
-    count: d.count,
-  }));
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 
   const columns = [
     { key: 'id', label: 'EMP ID' },
@@ -115,10 +83,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
 
   return (
     <div className="space-y-6">
-<<<<<<< HEAD
-=======
-      {/* KPIs */}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard title="Total Workforce" value={employees.length} subtitle="All employees"
           icon={<Users size={20} />} colorClass="text-blue-600" bgClass="bg-blue-50" borderClass="border-blue-100" />
@@ -130,7 +94,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
           icon={<Briefcase size={20} />} colorClass="text-amber-600" bgClass="bg-amber-50" borderClass="border-amber-100" />
       </div>
 
-<<<<<<< HEAD
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <KPICard title="Existing Stores" value={existingStores.length} subtitle="Currently active stores"
           icon={<MapPin size={20} />} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
@@ -140,9 +103,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
           icon={<Briefcase size={20} />} colorClass="text-violet-600" bgClass="bg-violet-50" borderClass="border-violet-100" />
       </div>
 
-=======
-      {/* Charts Row 1 */}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard title="Location-wise Headcount" subtitle="Employees per city">
           <ResponsiveContainer width="100%" height={240}>
@@ -159,10 +119,9 @@ export default function WorkforceAnalytics({ employees }: Props) {
         </SectionCard>
 
         <SectionCard title="Employment Status" subtitle="Active / On Leave / Inactive">
-<<<<<<< HEAD
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
-              <Pie data={statusData} cx="50%" cy="50%" outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              <Pie data={statusData} cx="50%" cy="50%" outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={false}>
                 <Cell fill="#10b981" />
                 <Cell fill="#f59e0b" />
@@ -174,25 +133,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
         </SectionCard>
       </div>
 
-=======
-          <div className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={statusData} cx="50%" cy="50%" outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}>
-                  <Cell fill="#10b981" />
-                  <Cell fill="#f59e0b" />
-                  <Cell fill="#94a3b8" />
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </SectionCard>
-      </div>
-
-      {/* Charts Row 2 */}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SectionCard title="Monthly Joining Trend" subtitle="New hires per month" className="lg:col-span-2">
           <ResponsiveContainer width="100%" height={220}>
@@ -219,10 +159,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
         </SectionCard>
       </div>
 
-<<<<<<< HEAD
-=======
-      {/* Charts Row 3 */}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard title="Designation Breakdown" subtitle="Top designations by headcount">
           <ResponsiveContainer width="100%" height={240}>
@@ -251,10 +187,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
         </SectionCard>
       </div>
 
-<<<<<<< HEAD
-=======
-      {/* Department Radar */}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <SectionCard title="Department Distribution" subtitle="Radar overview of department headcounts">
         <ResponsiveContainer width="100%" height={280}>
           <RadarChart cx="50%" cy="50%" outerRadius={100} data={radarData}>
@@ -266,7 +198,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
         </ResponsiveContainer>
       </SectionCard>
 
-<<<<<<< HEAD
       <SectionCard title="Store Details" subtitle="Existing, exiting, and upcoming store view">
         <DataTable
           columns={[
@@ -293,9 +224,6 @@ export default function WorkforceAnalytics({ employees }: Props) {
         />
       </SectionCard>
 
-=======
-      {/* Employee Table */}
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
       <SectionCard title="Employee Directory" subtitle={`${employees.length} employees`}
         action={<span className="text-xs text-gray-400 font-medium">Sortable & Searchable</span>}>
         <DataTable
@@ -326,7 +254,6 @@ function buildMonthlyJoining(employees: Employee[]) {
   employees.forEach(e => { const k = e.doj.substring(0, 7); if (months[k]) months[k].count++; });
   return Object.values(months);
 }
-<<<<<<< HEAD
 
 type StoreStatusRow = {
   store: string;
@@ -348,5 +275,3 @@ function buildStoreStatus(employees: Employee[], exits: ExitEmployee[]): StoreSt
     return { store, active, exits: storeExits, status };
   }).sort((a, b) => b.active - a.active || b.exits - a.exits);
 }
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc

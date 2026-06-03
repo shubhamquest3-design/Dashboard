@@ -31,7 +31,6 @@ export interface ExitEmployee {
   tenureAtExit: number;
 }
 
-<<<<<<< HEAD
 export interface ApprovedWorkforce {
   id: string;
   store: string;
@@ -47,10 +46,6 @@ export interface ApprovedWorkforce {
 export type ActiveSection =
   | 'executive'
   | 'approved'
-=======
-export type ActiveSection =
-  | 'executive'
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
   | 'workforce'
   | 'attrition'
   | 'advanced'
@@ -86,9 +81,6 @@ export interface SheetConfig {
   apiKey: string;
   employeeSheetName: string;
   exitSheetName: string;
-<<<<<<< HEAD
   approvedWorkforceSheetName?: string;
   openPositionsSheetName?: string;
-=======
->>>>>>> 29d75573b4d1e324fafe9c6309ac7d5d06fe8dbc
 }
