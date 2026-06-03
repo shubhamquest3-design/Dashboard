@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Employee, ExitEmployee, FilterState, SheetConfig } from '../types/hr';
-import { generateEmployees, generateExitEmployees } from '../data/mockData';
 import { fetchSheetData, parseEmployeesFromSheet, parseExitsFromSheet, loadSheetConfig } from '../lib/googleSheets';
 
 interface HRDataState {
@@ -46,20 +45,20 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
         setState(prev => ({
           ...prev,
           loading: false,
-          error: `Google Sheets sync failed: ${err instanceof Error ? err.message : 'Unknown error'}. Showing demo data.`,
-          employees: generateEmployees(),
-          exits: generateExitEmployees(),
+          error: `Google Sheets sync failed: ${err instanceof Error ? err.message : 'Unknown error'}.`,
+          employees: [],
+          exits: [],
           lastSync: new Date(),
           isLiveMode: false,
         }));
       }
     } else {
       setState({
-        employees: generateEmployees(),
-        exits: generateExitEmployees(),
+        employees: [],
+        exits: [],
         loading: false,
-        error: null,
-        lastSync: new Date(),
+        error: 'Google Sheets is not configured. Add your spreadsheet settings to load HR data.',
+        lastSync: null,
         isLiveMode: false,
       });
     }

@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { ActiveSection, FilterState, SheetConfig } from './types/hr';
 import { useHRData } from './hooks/useHRData';
 import { loadSheetConfig } from './lib/googleSheets';
-import { STORES, LOCATIONS, DESIGNATIONS } from './data/mockData';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import ExecutiveSummary from './components/sections/ExecutiveSummary';
@@ -75,9 +74,9 @@ export default function App() {
           onRefresh={refresh}
           filters={filters}
           onFilterChange={setFilters}
-          stores={availableStores.length > 0 ? availableStores : STORES}
-          locations={availableLocations.length > 0 ? availableLocations : LOCATIONS}
-          designations={availableDesignations.length > 0 ? availableDesignations : DESIGNATIONS}
+          stores={availableStores}
+          locations={availableLocations}
+          designations={availableDesignations}
         />
 
         {/* Error toast */}

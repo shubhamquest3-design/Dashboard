@@ -53,7 +53,7 @@ export default function Header({
               </span>
             ) : (
               <span className="flex items-center gap-1.5 rounded-full border border-[#d7bd6f] bg-[#fbf3d5] px-3 py-1 text-xs font-bold text-[#7a5b13] shadow-sm">
-                <WifiOff size={13} className="text-amber-600" /> Demo Mode
+                <WifiOff size={13} className="text-amber-600" /> Not Connected
               </span>
             )}
             {lastSync && (

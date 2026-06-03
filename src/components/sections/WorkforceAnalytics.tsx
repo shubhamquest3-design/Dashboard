@@ -1,5 +1,4 @@
 import { Employee, ExitEmployee } from '../../types/hr';
-import { STORES } from '../../data/mockData';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
 import DataTable from '../ui/DataTable';
@@ -268,7 +267,12 @@ function buildStoreStatus(employees: Employee[], exits: ExitEmployee[]): StoreSt
   employees.forEach(employee => { activeByStore[employee.store] = (activeByStore[employee.store] || 0) + 1; });
   exits.forEach(exit => { exitsByStore[exit.store] = (exitsByStore[exit.store] || 0) + 1; });
 
-  return STORES.map(store => {
+  const storeNames = Array.from(new Set([
+    ...employees.map(employee => employee.store),
+    ...exits.map(exit => exit.store),
+  ])).sort();
+
+  return storeNames.map(store => {
     const active = activeByStore[store] || 0;
     const storeExits = exitsByStore[store] || 0;
     const status: StoreStatusRow['status'] = active === 0 ? 'Upcoming' : storeExits > active ? 'Exiting' : 'Existing';

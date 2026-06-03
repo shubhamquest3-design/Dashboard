@@ -37,7 +37,7 @@ export default function SettingsPanel({ config, onConfigSave, isLiveMode }: Prop
         <div className={`text-sm ${isLiveMode ? 'text-emerald-800' : 'text-amber-800'}`}>
           {isLiveMode
             ? <><span className="font-bold">Connected to Google Sheets.</span> Dashboard is syncing live data. Auto-refresh every 60 seconds.</>
-            : <><span className="font-bold">Running in Demo Mode.</span> Configure your Google Sheets connection below to sync real HR data.</>}
+            : <><span className="font-bold">Google Sheets is not connected.</span> Configure your connection below to sync HR data.</>}
         </div>
       </div>
 
