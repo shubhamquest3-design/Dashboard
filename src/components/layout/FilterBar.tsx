@@ -52,7 +52,7 @@ export default function FilterBar({ filters, onFilterChange, stores, locations, 
 
         {expanded && (
           <>
-            <SelectFilter label="Status" value={filters.status} options={['Active', 'Inactive', 'On Leave']} onChange={v => set('status', v)} />
+             <SelectFilter label="Status" value={filters.status} options={['Working', 'Active', 'Resigned', 'Terminated', 'Absconded', 'On Hold', 'Inactive', 'On Leave']} onChange={v => set('status', v)} />
             <SelectFilter label="Hiring Source" value={filters.hiringSource} options={HIRING_SOURCES} onChange={v => set('hiringSource', v)} />
             <SelectFilter label="Tenure" value={filters.tenure} options={TENURE_BUCKETS} onChange={v => set('tenure', v)} />
           </>

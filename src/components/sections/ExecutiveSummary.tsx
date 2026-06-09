@@ -4,6 +4,7 @@ import {
   AlertTriangle, Building2, ClipboardList,
   ShieldCheck, Award, Star
 } from 'lucide-react';
+import { isActiveWorkforceStatus } from '../../lib/googleSheets';
 
 interface Props {
   employees: Employee[];
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export default function ExecutiveSummary({ employees, exits }: Props) {
-  const active = employees.filter(e => e.status === 'Active').length;
+  const active = employees.filter(e => isActiveWorkforceStatus(e.status)).length;
   const male = employees.filter(e => e.gender === 'Male').length;
   const female = employees.filter(e => e.gender === 'Female').length;
   const hdfcPending = employees.filter(e => e.hdfcAccount === 'No').length;
@@ -144,7 +145,7 @@ function buildStoreTable(employees: Employee[]) {
   employees.forEach(e => {
     if (!stores[e.store]) stores[e.store] = { store: e.store, total: 0, active: 0, male: 0, female: 0, hdfcPending: 0 };
     stores[e.store].total++;
-    if (e.status === 'Active') stores[e.store].active++;
+    if (isActiveWorkforceStatus(e.status)) stores[e.store].active++;
     if (e.gender === 'Male') stores[e.store].male++;
     if (e.gender === 'Female') stores[e.store].female++;
     if (e.hdfcAccount === 'No') stores[e.store].hdfcPending++;

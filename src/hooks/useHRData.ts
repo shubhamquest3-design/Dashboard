@@ -1,10 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Employee, ExitEmployee, FilterState, SheetConfig } from '../types/hr';
-import { fetchSheetData, parseEmployeesFromSheet, parseExitsFromSheet, loadSheetConfig } from '../lib/googleSheets';
+import { ApprovedWorkforce, Employee, ExitEmployee, FilterState, SheetConfig, StoreDetail } from '../types/hr';
+import {
+  fetchSheetData,
+  loadSheetConfig,
+  parseApprovedWorkforceFromSheet,
+  parseEmployeesFromSheet,
+  parseExitsFromSheet,
+  parseStoreDetailsFromEmployeeSheet,
+} from '../lib/googleSheets';
 
 interface HRDataState {
   employees: Employee[];
   exits: ExitEmployee[];
+  approvedWorkforce: ApprovedWorkforce[];
+  storeDetails: StoreDetail[];
   loading: boolean;
   error: string | null;
   lastSync: Date | null;
@@ -15,6 +24,8 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
   const [state, setState] = useState<HRDataState>({
     employees: [],
     exits: [],
+    approvedWorkforce: [],
+    storeDetails: [],
     loading: true,
     error: null,
     lastSync: null,
@@ -29,13 +40,16 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
 
     if (config?.spreadsheetId && config?.apiKey) {
       try {
-        const [empRows, exitRows] = await Promise.all([
-          fetchSheetData(config, config.employeeSheetName || 'Employees'),
-          fetchSheetData(config, config.exitSheetName || 'Exit'),
+        const [empRows, exitRows, approvedRows] = await Promise.all([
+          fetchSheetData(config, config.employeeSheetName || 'employee'),
+          fetchSheetData(config, config.exitSheetName || 'exit'),
+          fetchSheetData(config, config.approvedWorkforceSheetName || 'approved workforce').catch(() => []),
         ]);
         setState({
           employees: parseEmployeesFromSheet(empRows),
           exits: parseExitsFromSheet(exitRows),
+          approvedWorkforce: parseApprovedWorkforceFromSheet(approvedRows),
+          storeDetails: parseStoreDetailsFromEmployeeSheet(empRows),
           loading: false,
           error: null,
           lastSync: new Date(),
@@ -48,6 +62,8 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
           error: `Google Sheets sync failed: ${err instanceof Error ? err.message : 'Unknown error'}.`,
           employees: [],
           exits: [],
+          approvedWorkforce: [],
+          storeDetails: [],
           lastSync: new Date(),
           isLiveMode: false,
         }));
@@ -56,6 +72,8 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
       setState({
         employees: [],
         exits: [],
+        approvedWorkforce: [],
+        storeDetails: [],
         loading: false,
         error: 'Google Sheets is not configured. Add your spreadsheet settings to load HR data.',
         lastSync: null,
@@ -104,10 +122,17 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
     return true;
   });
 
+  const filteredStoreDetails = state.storeDetails.filter(detail => {
+    if (filters.store && detail.store !== filters.store) return false;
+    if (filters.location && detail.location !== filters.location) return false;
+    return true;
+  });
+
   return {
     ...state,
     filteredEmployees,
     filteredExits,
+    filteredStoreDetails,
     refresh: loadData,
   };
 }

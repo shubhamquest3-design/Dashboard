@@ -7,7 +7,7 @@ export interface Employee {
   department: string;
   store: string;
   location: string;
-  status: 'Active' | 'Inactive' | 'On Leave';
+  status: 'Active' | 'Working' | 'Inactive' | 'On Leave' | 'Resigned' | 'Terminated' | 'Absconded' | 'On Hold';
   tenure: string;
   reportingManager: string;
   hiringSource: 'Employee Referral' | 'Talent Acquisition' | 'HRBP' | 'Walk-in' | 'Consultant';
@@ -29,6 +29,13 @@ export interface ExitEmployee {
   location: string;
   designation: string;
   tenureAtExit: number;
+}
+
+export interface StoreDetail {
+  store: string;
+  location: string;
+  status: 'Existing' | 'Exiting' | 'NSO';
+  notes?: string;
 }
 
 export interface ApprovedWorkforce {

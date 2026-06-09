@@ -26,7 +26,7 @@ export default function App() {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [sheetConfig, setSheetConfig] = useState<SheetConfig | null>(loadSheetConfig);
 
-  const { filteredEmployees, filteredExits, loading, error, lastSync, isLiveMode, refresh } = useHRData(
+  const { filteredEmployees, filteredExits, filteredStoreDetails, approvedWorkforce, loading, error, lastSync, isLiveMode, refresh } = useHRData(
     filters, sheetConfig
   );
 
@@ -42,12 +42,12 @@ export default function App() {
 
   // Dedupe stores/locations from actual data
   const availableStores = useMemo(
-    () => [...new Set(filteredEmployees.map(e => e.store))].sort(),
-    [filteredEmployees]
+    () => [...new Set([...filteredEmployees.map(e => e.store), ...filteredStoreDetails.map(detail => detail.store)])].filter(Boolean).sort(),
+    [filteredEmployees, filteredStoreDetails]
   );
   const availableLocations = useMemo(
-    () => [...new Set(filteredEmployees.map(e => e.location))].sort(),
-    [filteredEmployees]
+    () => [...new Set([...filteredEmployees.map(e => e.location), ...filteredStoreDetails.map(detail => detail.location)])].filter(Boolean).sort(),
+    [filteredEmployees, filteredStoreDetails]
   );
   const availableDesignations = useMemo(
     () => [...new Set(filteredEmployees.map(e => e.designation))].sort(),
@@ -103,10 +103,14 @@ export default function App() {
               <ExecutiveSummary employees={filteredEmployees} exits={filteredExits} />
             )}
             {section === 'approved' && (
-              <ApprovedWorkforce employees={filteredEmployees} />
+              <ApprovedWorkforce
+                employees={filteredEmployees}
+                approvedRowsFromSheet={approvedWorkforce}
+                useSheetApprovedRows={isLiveMode}
+              />
             )}
             {section === 'workforce' && (
-              <WorkforceAnalytics employees={filteredEmployees} exits={filteredExits} />
+              <WorkforceAnalytics employees={filteredEmployees} exits={filteredExits} storeDetails={filteredStoreDetails} approvedRows={approvedWorkforce} />
             )}
             {section === 'attrition' && (
               <AttritionAnalytics employees={filteredEmployees} exits={filteredExits} />

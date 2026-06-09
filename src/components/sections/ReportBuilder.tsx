@@ -5,6 +5,7 @@ import {
   Building2, CheckCircle2, CreditCard, Download, FileSpreadsheet, Plus,
   Sparkles, Target, TrendingDown, Trash2, Users
 } from 'lucide-react';
+import { isActiveWorkforceStatus } from '../../lib/googleSheets';
 
 interface Report {
   name: string;
@@ -303,7 +304,7 @@ function buildCustomReportWorkbook(report: Report, employees: Employee[], exits:
         summary.push(['Total Employees', totalEmployees]);
         break;
       case 'active_employees':
-        summary.push(['Active Employees', employees.filter(employee => employee.status === 'Active').length]);
+        summary.push(['Active Employees', employees.filter(employee => isActiveWorkforceStatus(employee.status)).length]);
         break;
       case 'retention_rate':
         summary.push(['Retention Rate (%)', totalEverEmployed > 0 ? ((totalEmployees / totalEverEmployed) * 100).toFixed(2) : '0.00']);
@@ -376,7 +377,7 @@ function buildQuickReportWorkbook(reportId: QuickReportId, employees: Employee[]
 }
 
 function buildWorkforceWorkbook(employees: Employee[]): WorkbookExport {
-  const active = employees.filter(employee => employee.status === 'Active').length;
+  const active = employees.filter(employee => isActiveWorkforceStatus(employee.status)).length;
   const onLeave = employees.filter(employee => employee.status === 'On Leave').length;
   const inactive = employees.filter(employee => employee.status === 'Inactive').length;
   const storeSummary = buildStoreSummary(employees);
@@ -657,7 +658,7 @@ function buildHiringWorkbook(employees: Employee[], exits: ExitEmployee[]): Work
 function buildApprovedRowsFromActual(employees: Employee[]): ApprovedWorkforceRow[] {
   const map = new Map<string, ApprovedWorkforceRow>();
   employees
-    .filter(employee => employee.status === 'Active')
+    .filter(employee => isActiveWorkforceStatus(employee.status))
     .forEach(employee => {
       const key = keyFor(employee.store, employee.location);
       const row = map.get(key) ?? {
@@ -741,7 +742,7 @@ function buildApprovedMatrix(employees: Employee[], approvedRows: ApprovedWorkfo
 function buildCurrentByBucket(employees: Employee[], store: string, location: string) {
   const buckets: Record<Bucket, number> = { SM: 0, ASM: 0, SSA: 0, SA: 0, OA: 0 };
   employees
-    .filter(employee => employee.status === 'Active' && employee.store === store && (!location || employee.location === location))
+    .filter(employee => isActiveWorkforceStatus(employee.status) && employee.store === store && (!location || employee.location === location))
     .forEach(employee => {
       buckets[classifyBucket(employee.designation)] += 1;
     });
@@ -796,7 +797,7 @@ function buildStoreSummary(employees: Employee[]) {
       map[employee.store] = { store: employee.store, total: 0, active: 0, onLeave: 0, inactive: 0, male: 0, female: 0 };
     }
     map[employee.store].total++;
-    if (employee.status === 'Active') map[employee.store].active++;
+    if (isActiveWorkforceStatus(employee.status)) map[employee.store].active++;
     if (employee.status === 'On Leave') map[employee.store].onLeave++;
     if (employee.status === 'Inactive') map[employee.store].inactive++;
     if (employee.gender === 'Male') map[employee.store].male++;
@@ -812,7 +813,7 @@ function buildDesignationSummary(employees: Employee[]) {
       map[employee.designation] = { name: employee.designation, total: 0, active: 0 };
     }
     map[employee.designation].total++;
-    if (employee.status === 'Active') map[employee.designation].active++;
+    if (isActiveWorkforceStatus(employee.status)) map[employee.designation].active++;
   });
   return Object.values(map).sort((a, b) => b.total - a.total);
 }
@@ -949,12 +950,38 @@ function totalCurrent(row: { current: Record<Bucket, number> }) {
 }
 
 function classifyBucket(designation: string): Bucket {
-  const value = designation.trim().toLowerCase();
-  if (value.includes('store manager') || value === 'sm') return 'SM';
-  if (value.includes('assistant manager') || value === 'asm') return 'ASM';
-  if (value.includes('security') || value.includes('merchand') || value.includes('visual') || value.includes('hr executive')) return 'SSA';
-  if (value.includes('cashier') || value === 'sa' || value.includes('sales associate')) return 'SA';
+  const normalized = normalizeDesignation(designation);
+  const tokens = normalized.split(' ').filter(Boolean);
+  const compact = tokens.join('');
+
+  if (tokens.includes('asm') || compact === 'assistantstoremanager' || compact === 'assistantmanager' || normalized.includes('assistant store manager')) {
+    return 'ASM';
+  }
+  if (tokens.includes('ssa') || normalized.includes('senior sales associate') || normalized.includes('sr sales associate')) {
+    return 'SSA';
+  }
+  if (tokens.includes('sm') || compact === 'storemanager' || normalized.includes('store manager')) {
+    return 'SM';
+  }
+  if (tokens.includes('sa') || normalized.includes('sales associate') || normalized.includes('sales advisor')) {
+    return 'SA';
+  }
+  if (tokens.includes('oa') || normalized.includes('operation associate') || normalized.includes('operations associate') || normalized.includes('office assistant')) {
+    return 'OA';
+  }
+  if (normalized.includes('cashier') || normalized.includes('customer advisor')) return 'SA';
+  if (normalized.includes('security') || normalized.includes('merchand') || normalized.includes('visual') || normalized.includes('hr executive')) return 'SSA';
   return 'OA';
+}
+
+function normalizeDesignation(value: string) {
+  return value
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ');
 }
 
 function statusFromGap(gap: number) {

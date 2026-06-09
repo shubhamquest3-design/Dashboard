@@ -1,4 +1,4 @@
-import { Employee, ExitEmployee } from '../../types/hr';
+import { ApprovedWorkforce, Employee, ExitEmployee, StoreDetail } from '../../types/hr';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
 import DataTable from '../ui/DataTable';
@@ -8,20 +8,25 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis
 } from 'recharts';
+import { isActiveWorkforceStatus } from '../../lib/googleSheets';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#ec4899'];
 
-interface Props { employees: Employee[]; exits: ExitEmployee[] }
+interface Props { employees: Employee[]; exits: ExitEmployee[]; storeDetails?: StoreDetail[]; approvedRows?: ApprovedWorkforce[] }
 
-export default function WorkforceAnalytics({ employees, exits }: Props) {
+export default function WorkforceAnalytics({ employees, exits, storeDetails = [], approvedRows = [] }: Props) {
   const today = new Date();
 
-  const active = employees.filter(e => e.status === 'Active').length;
-  const onLeave = employees.filter(e => e.status === 'On Leave').length;
-  const stores = groupCount(employees, 'store');
-  const locations = groupCount(employees, 'location');
-  const designations = groupCount(employees, 'designation');
-  const departments = groupCount(employees, 'department');
+  const activeEmployees = employees.filter(e => isActiveWorkforceStatus(e.status));
+  const actualActive = activeEmployees.length;
+  const approvedTotal = approvedRows.reduce((sum, row) => sum + row.approvedSM + row.approvedASM + row.approvedSSA + row.approvedSA + row.approvedOA, 0);
+  const workforceGap = approvedTotal - actualActive;
+  const workforcePct = approvedTotal > 0 ? Math.round((actualActive / approvedTotal) * 100) : 0;
+  const stores = groupCount(activeEmployees, 'store');
+  const regions = groupCount(activeEmployees, 'location');
+  const designations = groupCount(activeEmployees, 'designation');
+  const departments = groupCount(activeEmployees, 'department');
+  const excludedCount = employees.length - actualActive;
   const tenureBuckets = ['0-3 Months', '3-6 Months', '6-12 Months', '1-2 Years', '2+ Years'];
   const tenureData = tenureBuckets.map(b => ({
     name: b, count: employees.filter(e => e.tenure === b).length,
@@ -35,18 +40,14 @@ export default function WorkforceAnalytics({ employees, exits }: Props) {
     { name: '40+', count: employees.filter(e => (e.age ?? 0) > 40).length },
   ];
   const statusData = [
-    { name: 'Active', value: active },
-    { name: 'On Leave', value: onLeave },
-    { name: 'Inactive', value: employees.filter(e => e.status === 'Inactive').length },
+    { name: 'Active/Working', value: actualActive },
+    { name: 'Excluded', value: excludedCount },
   ];
   const radarData = departments.slice(0, 7).map(d => ({
     dept: d.name.length > 12 ? `${d.name.substring(0, 12)}...` : d.name,
     count: d.count,
   }));
-  const storeStatus = buildStoreStatus(employees, exits);
-  const existingStores = storeStatus.filter(row => row.status === 'Existing');
-  const exitingStores = storeStatus.filter(row => row.status === 'Exiting');
-  const upcomingStores = storeStatus.filter(row => row.status === 'Upcoming');
+  const storeStatus = buildStoreStatus(employees, exits, storeDetails);
 
   const columns = [
     { key: 'id', label: 'EMP ID' },
@@ -70,7 +71,7 @@ export default function WorkforceAnalytics({ employees, exits }: Props) {
     { key: 'location', label: 'Location' },
     { key: 'status', label: 'Status', render: (r: Employee) => (
       <span className={`px-2 py-0.5 rounded-full text-xs font-medium
-        ${r.status === 'Active' ? 'bg-emerald-50 text-emerald-700'
+        ${isActiveWorkforceStatus(r.status) ? 'bg-emerald-50 text-emerald-700'
         : r.status === 'On Leave' ? 'bg-amber-50 text-amber-700'
         : 'bg-gray-100 text-gray-600'}`}>
         {r.status}
@@ -82,49 +83,48 @@ export default function WorkforceAnalytics({ employees, exits }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPICard title="Total Workforce" value={employees.length} subtitle="All employees"
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <KPICard title="Approved Workforce" value={approvedTotal} subtitle="Approved headcount from sheet"
           icon={<Users size={20} />} colorClass="text-blue-600" bgClass="bg-blue-50" borderClass="border-blue-100" />
-        <KPICard title="Active" value={active} subtitle={`${((active / Math.max(employees.length, 1)) * 100).toFixed(0)}% active`}
+        <KPICard title="Actual Active Workforce" value={actualActive} subtitle={`${workforcePct}% of approved workforce`}
           icon={<Users size={20} />} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
-        <KPICard title="Stores Covered" value={stores.length} subtitle="Unique stores"
-          icon={<MapPin size={20} />} colorClass="text-cyan-600" bgClass="bg-cyan-50" borderClass="border-cyan-100" />
-        <KPICard title="Designations" value={designations.length} subtitle="Unique roles"
-          icon={<Briefcase size={20} />} colorClass="text-amber-600" bgClass="bg-amber-50" borderClass="border-amber-100" />
+        <KPICard title="Workforce Gap" value={workforceGap} subtitle="Approved vs active"
+          icon={<Calendar size={20} />} colorClass="text-amber-600" bgClass="bg-amber-50" borderClass="border-amber-100" />
+        <KPICard title="Workforce %" value={`${workforcePct}%`} subtitle="Active against approved"
+          icon={<Briefcase size={20} />} colorClass="text-cyan-600" bgClass="bg-cyan-50" borderClass="border-cyan-100" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <KPICard title="Existing Stores" value={existingStores.length} subtitle="Currently active stores"
+        <KPICard title="Stores Covered" value={stores.length} subtitle="Unique active stores"
           icon={<MapPin size={20} />} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
-        <KPICard title="Exiting Stores" value={exitingStores.length} subtitle="High exit pressure"
-          icon={<Calendar size={20} />} colorClass="text-rose-600" bgClass="bg-rose-50" borderClass="border-rose-100" />
-        <KPICard title="Upcoming Stores" value={upcomingStores.length} subtitle="No current workforce"
+        <KPICard title="Regions Covered" value={regions.length} subtitle="Unique regions"
+          icon={<MapPin size={20} />} colorClass="text-cyan-600" bgClass="bg-cyan-50" borderClass="border-cyan-100" />
+        <KPICard title="Designations" value={designations.length} subtitle="Unique roles"
           icon={<Briefcase size={20} />} colorClass="text-violet-600" bgClass="bg-violet-50" borderClass="border-violet-100" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title="Location-wise Headcount" subtitle="Employees per city">
+        <SectionCard title="Region-wise Headcount" subtitle="Active workforce per region">
           <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={locations.slice(0, 10)}>
+            <BarChart data={regions.slice(0, 10)}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip contentStyle={{ fontSize: 12 }} />
               <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Employees">
-                {locations.slice(0, 10).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                {regions.slice(0, 10).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </SectionCard>
 
-        <SectionCard title="Employment Status" subtitle="Active / On Leave / Inactive">
+        <SectionCard title="Employment Status" subtitle="Active / Excluded">
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie data={statusData} cx="50%" cy="50%" outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={false}>
                 <Cell fill="#10b981" />
                 <Cell fill="#f59e0b" />
-                <Cell fill="#94a3b8" />
               </Pie>
               <Tooltip contentStyle={{ fontSize: 12 }} />
             </PieChart>
@@ -197,10 +197,11 @@ export default function WorkforceAnalytics({ employees, exits }: Props) {
         </ResponsiveContainer>
       </SectionCard>
 
-      <SectionCard title="Store Details" subtitle="Existing, exiting, and upcoming store view">
+      <SectionCard title="Store-wise Workforce" subtitle="Approved vs active headcount by store">
         <DataTable
           columns={[
             { key: 'store', label: 'Store' },
+            { key: 'location', label: 'Location' },
             { key: 'active', label: 'Active' },
             { key: 'exits', label: 'Exits' },
             {
@@ -216,10 +217,22 @@ export default function WorkforceAnalytics({ employees, exits }: Props) {
                 </span>
               ),
             },
+            {
+              key: 'activeEmployeeDetails',
+              label: 'Active Employees',
+              sortable: false,
+              render: (row: StoreStatusRow) => <EmployeeList value={row.activeEmployeeDetails} />,
+            },
+            {
+              key: 'exitEmployeeDetails',
+              label: 'Exit Details',
+              sortable: false,
+              render: (row: StoreStatusRow) => <EmployeeList value={row.exitEmployeeDetails} />,
+            },
           ] as Parameters<typeof DataTable>[0]['columns']}
           data={storeStatus as unknown as Record<string, unknown>[]}
           pageSize={8}
-          searchFields={['store', 'status'] as never[]}
+          searchFields={['store', 'location', 'status', 'activeEmployeeDetails', 'exitEmployeeDetails'] as never[]}
         />
       </SectionCard>
 
@@ -256,26 +269,83 @@ function buildMonthlyJoining(employees: Employee[]) {
 
 type StoreStatusRow = {
   store: string;
+  location: string;
   active: number;
   exits: number;
-  status: 'Existing' | 'Exiting' | 'Upcoming';
+  status: 'Existing' | 'Exiting' | 'NSO';
+  activeEmployeeDetails: string;
+  exitEmployeeDetails: string;
 };
 
-function buildStoreStatus(employees: Employee[], exits: ExitEmployee[]): StoreStatusRow[] {
-  const activeByStore: Record<string, number> = {};
-  const exitsByStore: Record<string, number> = {};
-  employees.forEach(employee => { activeByStore[employee.store] = (activeByStore[employee.store] || 0) + 1; });
-  exits.forEach(exit => { exitsByStore[exit.store] = (exitsByStore[exit.store] || 0) + 1; });
+function buildStoreStatus(employees: Employee[], exits: ExitEmployee[], storeDetails: StoreDetail[]): StoreStatusRow[] {
+  const storeMap = new Map<string, {
+    store: string;
+    location: string;
+    statusOverride?: StoreStatusRow['status'];
+    activeEmployees: Employee[];
+    exitEmployees: ExitEmployee[];
+  }>();
 
-  const storeNames = Array.from(new Set([
-    ...employees.map(employee => employee.store),
-    ...exits.map(exit => exit.store),
-  ])).sort();
+  const ensureStore = (store: string, location = '') => {
+    const key = normalizeKeyPart(store);
+    const entry = storeMap.get(key) ?? { store, location, activeEmployees: [], exitEmployees: [] };
+    if (!entry.location && location) entry.location = location;
+    storeMap.set(key, entry);
+    return entry;
+  };
 
-  return storeNames.map(store => {
-    const active = activeByStore[store] || 0;
-    const storeExits = exitsByStore[store] || 0;
-    const status: StoreStatusRow['status'] = active === 0 ? 'Upcoming' : storeExits > active ? 'Exiting' : 'Existing';
-    return { store, active, exits: storeExits, status };
-  }).sort((a, b) => b.active - a.active || b.exits - a.exits);
+  employees.forEach(employee => {
+    if (!employee.store) return;
+    const entry = ensureStore(employee.store, employee.location);
+    if (isActiveWorkforceStatus(employee.status)) entry.activeEmployees.push(employee);
+  });
+
+  exits.forEach(exit => {
+    if (!exit.store) return;
+    const entry = ensureStore(exit.store, exit.location);
+    entry.exitEmployees.push(exit);
+  });
+
+  storeDetails.forEach(detail => {
+    if (!detail.store) return;
+    const entry = ensureStore(detail.store, detail.location);
+    entry.statusOverride = detail.status;
+  });
+
+  return Array.from(storeMap.values()).map(entry => {
+    const active = entry.activeEmployees.length;
+    const storeExits = entry.exitEmployees.length;
+    const status: StoreStatusRow['status'] = entry.statusOverride ?? (active === 0 ? 'NSO' : storeExits > active ? 'Exiting' : 'Existing');
+    return {
+      store: entry.store,
+      location: entry.location,
+      active,
+      exits: storeExits,
+      status,
+      activeEmployeeDetails: formatPeople(entry.activeEmployees),
+      exitEmployeeDetails: formatPeople(entry.exitEmployees),
+    };
+  }).sort((a, b) => statusRank(a.status) - statusRank(b.status) || b.active - a.active || b.exits - a.exits);
+}
+
+function EmployeeList({ value }: { value: string }) {
+  return <div className="max-w-[260px] whitespace-normal leading-5 text-gray-700">{value || '-'}</div>;
+}
+
+function formatPeople(rows: Array<Employee | ExitEmployee>) {
+  return rows.map(row => `${row.name}${row.designation ? ` (${row.designation})` : ''}`).join(', ');
+}
+
+function statusRank(status: StoreStatusRow['status']) {
+  return status === 'Exiting' ? 0 : status === 'NSO' ? 1 : 2;
+}
+
+function normalizeKeyPart(value: string) {
+  return value
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/[\u2010-\u2015]/g, '-')
+    .replace(/\s*-\s*/g, '-')
+    .replace(/\s+/g, ' ');
 }

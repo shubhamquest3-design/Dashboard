@@ -1,4 +1,5 @@
 import { Employee, ExitEmployee } from '../../types/hr';
+import { isActiveWorkforceStatus } from '../../lib/googleSheets';
 import { useMemo, useState } from 'react';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
@@ -54,7 +55,7 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
 
   const funnelData = [
     { name: 'Total Workforce', value: employees.length + exits.length, fill: '#3b82f6' },
-    { name: 'Currently Active', value: employees.filter(e => e.status === 'Active').length, fill: '#10b981' },
+    { name: 'Currently Active', value: employees.filter(e => isActiveWorkforceStatus(e.status)).length, fill: '#10b981' },
     { name: 'Exits (All Time)', value: totalLeft, fill: '#ef4444' },
     { name: 'Voluntary Exits', value: voluntary, fill: '#f97316' },
   ];
