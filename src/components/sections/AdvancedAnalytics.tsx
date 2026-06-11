@@ -2,6 +2,7 @@ import { Employee, ExitEmployee } from '../../types/hr';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
 import { TrendingUp, Calendar, AlertCircle, Target } from 'lucide-react';
+import { parseFlexibleDate } from '../../lib/googleSheets';
 import {
   Line, AreaChart, Area, BarChart, ScatterChart, Scatter,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -243,7 +244,8 @@ function buildAttritionTrend(employees: Employee[], exits: ExitEmployee[]) {
     months[key] = { month: d.toLocaleString('default', { month: 'short' }), exits: 0, rate: 0 };
   }
   exits.forEach(e => {
-    const k = e.dol.substring(0, 7);
+    const parsed = parseFlexibleDate(e.dol);
+    const k = parsed ? `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}` : '';
     if (months[k]) months[k].exits++;
   });
   const monthVals = Object.values(months);
@@ -264,7 +266,13 @@ function buildHeadcountTrend(employees: Employee[], exits: ExitEmployee[]) {
   }
   const monthVals = Object.values(months);
   monthVals.forEach((m, idx) => {
-    const exitsUntilNow = exits.filter(e => e.dol.substring(0, 7) <= Object.keys(months)[idx]).length;
+    const currentKey = Object.keys(months)[idx];
+    const exitsUntilNow = exits.filter(e => {
+      const parsed = parseFlexibleDate(e.dol);
+      if (!parsed) return false;
+      const key = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}`;
+      return key <= currentKey;
+    }).length;
     m.actual = employees.length + exitsUntilNow;
   });
   const avgGrowth = monthVals.length > 1 ? (monthVals[monthVals.length - 1].actual - monthVals[0].actual) / (monthVals.length - 1) : 0;

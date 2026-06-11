@@ -1,5 +1,5 @@
 import { Employee, ExitEmployee } from '../../types/hr';
-import { isActiveWorkforceStatus } from '../../lib/googleSheets';
+import { isActiveWorkforceStatus, parseFlexibleDate } from '../../lib/googleSheets';
 import { useMemo, useState } from 'react';
 import KPICard from '../ui/KPICard';
 import SectionCard from '../ui/SectionCard';
@@ -292,6 +292,10 @@ export default function AttritionAnalytics({ employees, exits }: Props) {
   );
 }
 
+function normalizeId(value: string) {
+  return value.trim().toLowerCase();
+}
+
 function groupCount(arr: ExitEmployee[], key: keyof ExitEmployee) {
   const map: Record<string, number> = {};
   arr.forEach(e => { const v = String(e[key]); map[v] = (map[v] || 0) + 1; });
@@ -306,7 +310,12 @@ function buildMonthlyAttrition(exits: ExitEmployee[]) {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     months[key] = { month: d.toLocaleString('default', { month: 'short', year: '2-digit' }), exits: 0 };
   }
-  exits.forEach(e => { const k = e.dol.substring(0, 7); if (months[k]) months[k].exits++; });
+  exits.forEach(e => {
+    const parsed = parseFlexibleDate(e.dol);
+    if (!parsed) return;
+    const k = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}`;
+    if (months[k]) months[k].exits++;
+  });
   return Object.values(months);
 }
 
@@ -326,12 +335,9 @@ function MiniSplit({ label, count, total, color }: { label: string; count: numbe
 }
 
 function buildGenderExitSplit(employees: Employee[], exits: ExitEmployee[]) {
-  const employeeMap = new Map(
-    employees.map(employee => [genderMatchKey(employee.name, employee.store, employee.doj), employee.gender])
-  );
   const counts: Record<'Male' | 'Female', number> = { Male: 0, Female: 0 };
   exits.forEach(exit => {
-    const gender = employeeMap.get(genderMatchKey(exit.name, exit.store, exit.doj));
+    const gender = exit.gender ?? employees.find(employee => normalizeId(employee.id) === normalizeId(exit.id))?.gender;
     if (gender === 'Male' || gender === 'Female') counts[gender] += 1;
   });
   const total = Math.max(exits.length, 1);
@@ -340,10 +346,6 @@ function buildGenderExitSplit(employees: Employee[], exits: ExitEmployee[]) {
     count: counts[gender],
     percent: Math.round((counts[gender] / total) * 100),
   }));
-}
-
-function genderMatchKey(name: string, store: string, doj: string) {
-  return `${name.trim().toLowerCase()}__${store.trim().toLowerCase()}__${doj.trim()}`;
 }
 
 function SelectFilter({

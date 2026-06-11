@@ -7,6 +7,7 @@ import {
   parseEmployeesFromSheet,
   parseExitsFromSheet,
   parseStoreDetailsFromEmployeeSheet,
+  parseFlexibleDate,
 } from '../lib/googleSheets';
 
 interface HRDataState {
@@ -108,8 +109,11 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
     if (filters.status && emp.status !== filters.status) return false;
     if (filters.hiringSource && emp.hiringSource !== filters.hiringSource) return false;
     if (filters.tenure && emp.tenure !== filters.tenure) return false;
-    if (filters.dateFrom && emp.doj < filters.dateFrom) return false;
-    if (filters.dateTo && emp.doj > filters.dateTo) return false;
+    const doj = toDateOnly(parseFlexibleDate(emp.doj));
+    const dateFrom = toDateOnly(parseFlexibleDate(filters.dateFrom));
+    const dateTo = endOfDay(parseFlexibleDate(filters.dateTo));
+    if (dateFrom && (!doj || doj < dateFrom)) return false;
+    if (dateTo && (!doj || doj > dateTo)) return false;
     return true;
   });
 
@@ -117,8 +121,11 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
     if (filters.store && exit.store !== filters.store) return false;
     if (filters.location && exit.location !== filters.location) return false;
     if (filters.designation && exit.designation !== filters.designation) return false;
-    if (filters.dateFrom && exit.dol < filters.dateFrom) return false;
-    if (filters.dateTo && exit.doj > filters.dateTo) return false;
+    const dol = toDateOnly(parseFlexibleDate(exit.dol));
+    const dateFrom = toDateOnly(parseFlexibleDate(filters.dateFrom));
+    const dateTo = endOfDay(parseFlexibleDate(filters.dateTo));
+    if (dateFrom && (!dol || dol < dateFrom)) return false;
+    if (dateTo && (!dol || dol > dateTo)) return false;
     return true;
   });
 
@@ -135,4 +142,14 @@ export function useHRData(filters: FilterState, sheetConfig: SheetConfig | null,
     filteredStoreDetails,
     refresh: loadData,
   };
+}
+
+function toDateOnly(value: Date | null) {
+  if (!value) return null;
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+}
+
+function endOfDay(value: Date | null) {
+  if (!value) return null;
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate(), 23, 59, 59, 999);
 }

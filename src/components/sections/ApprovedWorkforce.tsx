@@ -384,7 +384,7 @@ function buildCurrentByBucket(employees: Employee[], store: string, location = '
   const targetStore = normalizeKeyPart(store);
   const targetLocation = normalizeKeyPart(location);
   employees.filter(e => {
-    if (e.status !== 'Active') return false;
+    if (!isActiveWorkforceStatus(e.status)) return false;
     if (location) return keyFor(e.store, e.location) === targetKey;
     return normalizeKeyPart(e.store) === targetStore && (!targetLocation || normalizeKeyPart(e.location) === targetLocation);
   }).forEach(employee => {

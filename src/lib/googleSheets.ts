@@ -91,8 +91,10 @@ export function parseExitsFromSheet(rows: string[][]): ExitEmployee[] {
     const getAny = (keys: readonly string[]) => getByHeader(row, headers, keys);
     const doj = getAny(['doj', 'date_of_joining', 'joining_date']);
     const dol = getAny(['dol', 'date_of_leaving', 'leaving_date']);
-    const tenureMonths = doj && dol
-      ? Math.round((new Date(dol).getTime() - new Date(doj).getTime()) / (1000 * 60 * 60 * 24 * 30))
+    const parsedDoj = parseFlexibleDate(doj);
+    const parsedDol = parseFlexibleDate(dol);
+    const tenureMonths = parsedDoj && parsedDol
+      ? Math.round((parsedDol.getTime() - parsedDoj.getTime()) / (1000 * 60 * 60 * 24 * 30))
       : 0;
     return {
       id: getAny(['employee_id', 'emp_id', 'id']) || `EXT${String(idx + 1).padStart(4, '0')}`,
@@ -104,6 +106,7 @@ export function parseExitsFromSheet(rows: string[][]): ExitEmployee[] {
       store: getAny(STORE_HEADERS) || '',
       location: getAny(LOCATION_HEADERS) || '',
       designation: getAny(['designation', 'role', 'position']) || '',
+      gender: normalizeGender(getAny(['gender', 'sex'])),
       tenureAtExit: parseInt(getAny(['tenure_at_exit'])) || tenureMonths,
     };
   }).filter(e => e.name);
@@ -239,6 +242,10 @@ export function isActiveWorkforceStatus(status: Employee['status']) {
   return status === 'Active' || status === 'Working';
 }
 
+export function isExitWorkforceStatus(status: Employee['status']) {
+  return status === 'Resigned' || status === 'Terminated' || status === 'Absconded' || status === 'On Hold' || status === 'Inactive';
+}
+
 function normalizeStoreStatus(value: string): StoreDetail['status'] | null {
   const normalized = normalizeHeader(value);
   if (!normalized) return null;
@@ -248,11 +255,97 @@ function normalizeStoreStatus(value: string): StoreDetail['status'] | null {
   return null;
 }
 
+function normalizeGender(value: string): ExitEmployee['gender'] {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'male') return 'Male';
+  if (normalized === 'female') return 'Female';
+  if (normalized === 'other') return 'Other';
+  return undefined;
+}
+
 export function getTenureBucket(doj: string): string {
-  const months = (Date.now() - new Date(doj).getTime()) / (1000 * 60 * 60 * 24 * 30);
+  const parsed = parseFlexibleDate(doj);
+  if (!parsed) return '0-3 Months';
+  const months = (Date.now() - parsed.getTime()) / (1000 * 60 * 60 * 24 * 30);
   if (months < 3) return '0-3 Months';
   if (months < 6) return '3-6 Months';
   if (months < 12) return '6-12 Months';
   if (months < 24) return '1-2 Years';
   return '2+ Years';
+}
+
+export function parseFlexibleDate(value: string): Date | null {
+  const text = value.trim();
+  if (!text) return null;
+
+  if (/^\d+(\.\d+)?$/.test(text)) {
+    const serial = Number(text);
+    if (Number.isFinite(serial)) {
+      return buildDateFromSerial(serial);
+    }
+  }
+
+  const normalized = text
+    .replace(/,\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const ymd = normalized.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[ T].*)?$/);
+  if (ymd) {
+    return buildDate(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]));
+  }
+
+  const dayMonthName = normalized.match(/^(\d{1,2})[-/\s]([A-Za-z]{3,9})[-/\s](\d{2,4})(?:[ T].*)?$/);
+  if (dayMonthName) {
+    const monthIndex = parseMonthName(dayMonthName[2]);
+    if (monthIndex === null) return null;
+    const year = Number(dayMonthName[3].length === 2 ? `20${dayMonthName[3]}` : dayMonthName[3]);
+    return buildDate(year, monthIndex, Number(dayMonthName[1]));
+  }
+
+  const monthDayName = normalized.match(/^([A-Za-z]{3,9})[-/\s](\d{1,2})[-/\s](\d{2,4})(?:[ T].*)?$/);
+  if (monthDayName) {
+    const monthIndex = parseMonthName(monthDayName[1]);
+    if (monthIndex === null) return null;
+    const year = Number(monthDayName[3].length === 2 ? `20${monthDayName[3]}` : monthDayName[3]);
+    return buildDate(year, monthIndex, Number(monthDayName[2]));
+  }
+
+  const slashDate = normalized.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})(?:[ T].*)?$/);
+  if (slashDate) {
+    const first = Number(slashDate[1]);
+    const second = Number(slashDate[2]);
+    const year = Number(slashDate[3].length === 2 ? `20${slashDate[3]}` : slashDate[3]);
+    const dayFirst = first > 12 || second <= 12;
+    const day = dayFirst ? first : second;
+    const month = dayFirst ? second - 1 : first - 1;
+    return buildDate(year, month, day);
+  }
+
+  const fallback = new Date(normalized);
+  return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
+const MONTHS = {
+  jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+  jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+} as const;
+
+function parseMonthName(value: string): number | null {
+  const normalized = value.trim().toLowerCase().slice(0, 3) as keyof typeof MONTHS;
+  return normalized in MONTHS ? MONTHS[normalized] : null;
+}
+
+function buildDate(year: number, monthIndex: number, day: number): Date | null {
+  const date = new Date(year, monthIndex, day);
+  if (Number.isNaN(date.getTime())) return null;
+  if (date.getFullYear() !== year || date.getMonth() !== monthIndex || date.getDate() !== day) return null;
+  return date;
+}
+
+function buildDateFromSerial(serial: number): Date | null {
+  if (!Number.isFinite(serial)) return null;
+  const base = new Date(1899, 11, 30);
+  const date = new Date(base.getTime() + serial * 24 * 60 * 60 * 1000);
+  return Number.isNaN(date.getTime()) ? null : date;
 }

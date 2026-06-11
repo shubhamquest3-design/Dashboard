@@ -21,6 +21,7 @@ export interface Employee {
 export interface ExitEmployee {
   id: string;
   name: string;
+  gender?: 'Male' | 'Female' | 'Other';
   doj: string;
   dol: string;
   exitReason: string;
